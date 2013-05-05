@@ -54,6 +54,11 @@ module WebHDFS
       JSON.parse(result.body)
     end
 
+    def status(path)
+      result = request('GET', path, 'GETFILESTATUS')
+      JSON.parse(result.body)
+    end
+
   private
 
     def allowed_opts(opts, valid_keys)

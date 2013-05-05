@@ -33,6 +33,7 @@ You now have access to the following methods:
  * mkdir(path) - Make a new directory
  * mv(path, destination) - Rename a file or directory
  * rm(path) - Remove a file or directory
+ * status(path) - The status of a file or directory
 
 ## Contributing
 

@@ -36,13 +36,25 @@ describe WebHDFS::Client do
     it 'should create a file' do
       client.create(test_path, '')
       count_nodes(root, '_test').should == 1
-      node_type(root, '_test').should == 'FILE'
+      node_type(test_path).should == 'FILE'
     end
   end
 
   describe '#ls' do
-    it 'should return file statuses' do
+    it 'should return folder contents' do
       client.ls(root)['FileStatuses'].should_not be_nil
+    end
+  end
+
+  describe '#status' do
+    it "should return a file's status" do
+      client.create(test_path, '')
+      node_type(test_path).should == 'FILE'
+      client.rm(test_path)
+    end
+    
+    it "should return a directory's status" do
+      node_type(root).should == 'DIRECTORY'
     end
   end
 
@@ -54,7 +66,7 @@ describe WebHDFS::Client do
     it 'should create a directory' do
       client.mkdir(test_path)
       count_nodes(root, '_test').should == 1
-      node_type(root, '_test').should == 'DIRECTORY'
+      node_type(test_path).should == 'DIRECTORY'
     end
 
     it 'should create a directory with permissions' do
@@ -125,8 +137,6 @@ def count_nodes(path, name)
   end.length
 end
 
-def node_type(path, name)
-  client.ls(path)['FileStatuses']['FileStatus'].map do |file|
-    file['type'] if file['pathSuffix'] == name
-  end[0]
+def node_type(path)
+  client.status(path)['FileStatus']['type']
 end
