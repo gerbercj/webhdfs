@@ -29,11 +29,13 @@ You now have access to the following methods:
  * append(path, data) - Add additional text to the end of a file
  * cat(path) - Display the contents of a stored file
  * create(path, data) - Create a new file
+ * home_dir - Get the user's home directory
  * ls(path) - List the contents of a directory
  * mkdir(path) - Make a new directory
  * mv(path, destination) - Rename a file or directory
  * rm(path) - Remove a file or directory
- * status(path) - The status of a file or directory
+ * status(path) - Status of a file or directory
+ * summary(path) - Summary information for a directory
 
 ## Contributing
 

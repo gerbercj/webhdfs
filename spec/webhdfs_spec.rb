@@ -1,8 +1,10 @@
 require 'spec_helper'
 
 describe WebHDFS::Client do
-  let(:client)    { WebHDFS::Client.new('cloudera', '192.168.186.146') }
-  let(:root)      { '/user/cloudera' }
+  let(:user)      { ENV['WEBHDFS_USER'] || 'cloudera' }
+  let(:host)      { ENV['WEBHDFS_HOST'] || '192.168.186.146' }
+  let(:client)    { WebHDFS::Client.new(user, host) }
+  let(:root)      { client.home_dir['Path'] }
   let(:test_path) { "#{root}/_test" }
   
   describe '#append' do
@@ -37,6 +39,12 @@ describe WebHDFS::Client do
       client.create(test_path, '')
       count_nodes(root, '_test').should == 1
       node_type(test_path).should == 'FILE'
+    end
+  end
+
+  describe '#home_dir' do
+    it 'should return a path' do
+      client.home_dir["Path"].should =~ /\//
     end
   end
 

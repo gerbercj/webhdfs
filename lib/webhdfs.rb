@@ -32,6 +32,11 @@ module WebHDFS
       JSON.parse(result.body) unless result.body.empty?
     end
 
+    def home_dir()
+      result = request('GET', '/', 'GETHOMEDIRECTORY')
+      JSON.parse(result.body)
+    end
+
     def ls(path)
       result = request('GET', path, 'LISTSTATUS')
       JSON.parse(result.body)
