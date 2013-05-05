@@ -219,6 +219,28 @@ describe WebHDFS::Client do
       client.summary(root).keys.should == ['ContentSummary']
     end
   end
+
+  describe '#touch' do
+    after :each do
+      client.rm(test_path)
+    end
+
+    it 'should update modification time' do
+      client.create(test_path, '')
+      old_time = client.status(test_path)['FileStatus']['modificationTime']
+      new_time = old_time + 1
+      client.touch(test_path, :modificationtime => new_time)
+      client.status(test_path)['FileStatus']['modificationTime'].should == new_time
+    end
+    
+    it 'should update access time' do
+      client.create(test_path, '')
+      old_time = client.status(test_path)['FileStatus']['accessTime']
+      new_time = old_time + 1
+      client.touch(test_path, :accesstime => new_time)
+      client.status(test_path)['FileStatus']['accessTime'].should == new_time
+    end
+  end
 end
 
 def count_nodes(path, name)

@@ -40,6 +40,9 @@ You now have access to the following methods:
  * rm(path) - Remove a file or directory
  * status(path) - Status of a file or directory
  * summary(path) - Summary information for a directory
+ * touch(path) - Set timestamps for a file
+
+Options for the various methods are described here: [WebHDFS API](http://http://hadoop.apache.org/docs/r1.0.4/webhdfs.html#SETOWNER)
 
 ## Contributing
 

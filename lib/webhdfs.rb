@@ -50,7 +50,7 @@ module WebHDFS
     end
 
     def home_dir()
-      result = request('GETHOMEDIRECTORY', 'GET')
+      result = request('GETHOMEDIRECTORY')
       JSON.parse(result.body)
     end
 
@@ -91,6 +91,13 @@ module WebHDFS
       result = request('GETCONTENTSUMMARY', 'GET', path)
       JSON.parse(result.body)
     end
+
+    def touch(path, opts={})
+      opts = allowed_opts(opts, %i(modificationtime accesstime))
+      result = request('SETTIMES', 'PUT', path, opts)
+      result.body
+    end
+
   private
 
     def allowed_opts(opts, valid_keys)
@@ -103,7 +110,7 @@ module WebHDFS
       end
     end
 
-    def request(op, method, path='/', opts='', data=nil, host=host, port=port, header=nil)
+    def request(op, method='GET', path='/', opts='', data=nil, host=host, port=port, header=nil)
       path = "#{REST_PREFIX}#{path}?user.name=#{user}&op=#{op}#{opts}" unless op.nil?
       connection = Net::HTTP.new(host, port)
       result = connection.send_request(method, path, data, header)
