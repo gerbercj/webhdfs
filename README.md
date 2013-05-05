@@ -29,11 +29,14 @@ You now have access to the following methods:
  * append(path, data) - Add additional text to the end of a file
  * cat(path) - Display the contents of a stored file
  * checksum(path) - Generate checksum information for a file
+ * chmod(path) - Set permissions for a file or directory
+ * chown(path) - Change the owner and/or group for a file or directory
  * create(path, data) - Create a new file
  * home_dir - Get the user's home directory
  * ls(path) - List the contents of a directory
  * mkdir(path) - Make a new directory
  * mv(path, destination) - Rename a file or directory
+ * replication(path) - Set the number of replications for a file
  * rm(path) - Remove a file or directory
  * status(path) - Status of a file or directory
  * summary(path) - Summary information for a directory

@@ -1,12 +1,17 @@
 require 'spec_helper'
 
 describe WebHDFS::Client do
-  let(:user)      { ENV['WEBHDFS_USER'] || 'cloudera' }
+  let(:user)      { ENV['WEBHDFS_USER'] || 'hdfs' }
   let(:host)      { ENV['WEBHDFS_HOST'] || '192.168.186.146' }
   let(:client)    { WebHDFS::Client.new(user, host) }
   let(:root)      { client.home_dir['Path'] }
   let(:test_path) { "#{root}/_test" }
   
+  before :all do
+    cleaner = WebHDFS::Client.new('hdfs', '192.168.186.146')
+    cleaner.rm('/user/cloudera/_test', :recursive => true)
+  end
+
   describe '#append' do
     after :each do
       client.rm(test_path)
@@ -38,6 +43,54 @@ describe WebHDFS::Client do
     it 'should be deterministic' do
       client.create(test_path, 'contents')
       client.checksum(test_path)['FileChecksum']['bytes'].should == '0000020000000000000000000702b40d10b999d851990de3da80d0d800000000'
+    end
+  end
+
+  describe '#chmod' do
+    after :each do
+      client.rm(test_path)
+    end
+
+    it 'should change permissions on files' do
+      client.create(test_path, '', :permission => 755)
+      client.chmod(test_path, :permission => 600)
+      client.status(test_path)['FileStatus']['permission'].should == '600'
+    end
+
+    it 'should change permissions on directories' do
+      client.mkdir(test_path, :permission => 755)
+      client.chmod(test_path, :permission => 600)
+      client.status(test_path)['FileStatus']['permission'].should == '600'
+    end
+  end
+
+  describe '#chown' do
+    after :each do
+      client.rm(test_path)
+    end
+
+    it 'should change owners on files' do
+      client.create(test_path, '')
+      client.chown(test_path, :owner => 'cloudera')
+      client.status(test_path)['FileStatus']['owner'].should == 'cloudera'
+    end
+
+    it 'should change groups on files' do
+      client.create(test_path, '')
+      client.chown(test_path, :group => 'cloudera')
+      client.status(test_path)['FileStatus']['group'].should == 'cloudera'
+    end
+
+    it 'should change owners on directories' do
+      client.mkdir(test_path)
+      client.chown(test_path, :owner => 'cloudera')
+      client.status(test_path)['FileStatus']['owner'].should == 'cloudera'
+    end
+
+    it 'should change groups on directories' do
+      client.mkdir(test_path)
+      client.chown(test_path, :group => 'cloudera')
+      client.status(test_path)['FileStatus']['group'].should == 'cloudera'
     end
   end
 
@@ -78,9 +131,7 @@ describe WebHDFS::Client do
 
     it 'should create a directory with permissions' do
       client.mkdir(test_path, :permission => '750')
-      client.ls(root)['FileStatuses']['FileStatus'].select do |file|
-        file['permission'] == '750' if file['pathSuffix'] == '_test'
-      end.length.should == 1
+      client.status(test_path)['FileStatus']['permission'].should == '750'
     end
   end
 
@@ -101,6 +152,20 @@ describe WebHDFS::Client do
       count_nodes(root, '_test').should == 0
       count_nodes(root, '_test2').should == 1
       client.rm(dest_path)
+    end
+  end
+
+  describe '#replication' do
+    after :each do
+      client.rm(test_path)
+    end
+
+    it 'should change replication for a file' do
+      client.create(test_path,'')
+      old_replication = client.status(test_path)['FileStatus']['replication']
+      new_replication = old_replication + 1
+      client.replication(test_path, :replication => new_replication)
+      client.status(test_path)['FileStatus']['replication'].should == new_replication
     end
   end
 

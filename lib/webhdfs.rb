@@ -31,6 +31,18 @@ module WebHDFS
       JSON.parse(result.body)
     end
 
+    def chmod(path, opts={})
+      opts = allowed_opts(opts, %i(permission))
+      result = request('SETPERMISSION', 'PUT', path, opts)
+      result.body
+    end
+
+    def chown(path, opts={})
+      opts = allowed_opts(opts, %i(owner group))
+      result = request('SETOWNER', 'PUT', path, opts)
+      result.body
+    end
+
     def create(path, data, opts={})
       opts = allowed_opts(opts, %i(overwrite blocksize replication permission buffersize))
       result = request('CREATE', 'PUT', path, opts, data)
@@ -58,6 +70,12 @@ module WebHDFS
       JSON.parse(result.body)
     end
 
+    def replication(path, opts={})
+      opts = allowed_opts(opts, %i(replication))
+      result = request('SETREPLICATION', 'PUT', path, opts)
+      JSON.parse(result.body)
+    end
+
     def rm(path, opts={})
       opts = allowed_opts(opts, %i(recursive))
       result = request('DELETE', 'DELETE', path, opts)
@@ -77,7 +95,11 @@ module WebHDFS
 
     def allowed_opts(opts, valid_keys)
       allowed = valid_keys.inject('') do |result, key|
-        "#{result}&#{key}=#{opts[key]}" if opts[key]
+        if opts[key]
+          "#{result}&#{key}=#{opts[key]}"
+        else
+          result
+        end
       end
     end
 
