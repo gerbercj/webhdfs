@@ -1,0 +1,10 @@
+#!/usr/bin/env ruby
+require 'webhdfs'
+
+display_help unless ARGV
+
+def display_help
+  puts <<-EOS
+  Usage: webhdfs ls|mkdir|rmdir path
+  EOS
+end
