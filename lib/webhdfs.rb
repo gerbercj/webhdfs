@@ -16,56 +16,61 @@ module WebHDFS
 
     def append(path, data, opts={})
       opts = allowed_opts(opts, %i(buffersize))
-      result = request('POST', path, 'APPEND', opts, data)
+      result = request('APPEND', 'POST', path, opts, data)
       result.body
     end
 
     def cat(path, opts={})
       opts = allowed_opts(opts, %i(offset length buffersize))
-      result = request('GET', path, 'OPEN', opts)
+      result = request('OPEN', 'GET', path, opts)
       result.body
+    end
+
+    def checksum(path)
+      result = request('GETFILECHECKSUM', 'GET', path)
+      JSON.parse(result.body)
     end
 
     def create(path, data, opts={})
       opts = allowed_opts(opts, %i(overwrite blocksize replication permission buffersize))
-      result = request('PUT', path, 'CREATE', opts, data)
+      result = request('CREATE', 'PUT', path, opts, data)
       JSON.parse(result.body) unless result.body.empty?
     end
 
     def home_dir()
-      result = request('GET', '/', 'GETHOMEDIRECTORY')
+      result = request('GETHOMEDIRECTORY', 'GET')
       JSON.parse(result.body)
     end
 
     def ls(path)
-      result = request('GET', path, 'LISTSTATUS')
+      result = request('LISTSTATUS', 'GET', path)
       JSON.parse(result.body)
     end
 
     def mkdir(path, opts={})
       opts = allowed_opts(opts, %i(permission))
-      result = request('PUT', path, 'MKDIRS', opts)
+      result = request('MKDIRS', 'PUT', path, opts)
       JSON.parse(result.body)
     end
 
     def mv(path, destination)
-      result = request('PUT', path, 'RENAME', "&destination=#{destination}")
+      result = request('RENAME', 'PUT', path, "&destination=#{destination}")
       JSON.parse(result.body)
     end
 
     def rm(path, opts={})
       opts = allowed_opts(opts, %i(recursive))
-      result = request('DELETE', path, 'DELETE', opts)
+      result = request('DELETE', 'DELETE', path, opts)
       JSON.parse(result.body)
     end
 
     def status(path)
-      result = request('GET', path, 'GETFILESTATUS')
+      result = request('GETFILESTATUS', 'GET', path)
       JSON.parse(result.body)
     end
 
     def summary(path)
-      result = request('GET', path, 'GETCONTENTSUMMARY')
+      result = request('GETCONTENTSUMMARY', 'GET', path)
       JSON.parse(result.body)
     end
   private
@@ -76,7 +81,7 @@ module WebHDFS
       end
     end
 
-    def request(method, path, op, opts='', data=nil, host=host, port=port, header=nil)
+    def request(op, method, path='/', opts='', data=nil, host=host, port=port, header=nil)
       path = "#{REST_PREFIX}#{path}?user.name=#{user}&op=#{op}#{opts}" unless op.nil?
       connection = Net::HTTP.new(host, port)
       result = connection.send_request(method, path, data, header)
@@ -85,7 +90,7 @@ module WebHDFS
         result
       when Net::HTTPRedirection
         uri = URI.parse(result['location'])
-        request(method, "#{uri.path}?#{uri.query}", nil, nil, data, host, uri.port, {'Content-Type' => 'application/octet-stream'})
+        request(nil, method, "#{uri.path}?#{uri.query}", nil, data, host, uri.port, {'Content-Type' => 'application/octet-stream'})
       when Net::HTTPForbidden
         raise result.to_s
       else

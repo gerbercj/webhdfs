@@ -30,6 +30,17 @@ describe WebHDFS::Client do
     end
   end
 
+  describe '#checksum' do
+    after :each do
+      client.rm(test_path)
+    end
+
+    it 'should be deterministic' do
+      client.create(test_path, 'contents')
+      client.checksum(test_path)['FileChecksum']['bytes'].should == '0000020000000000000000000702b40d10b999d851990de3da80d0d800000000'
+    end
+  end
+
   describe '#create' do
     after :each do
       client.rm(test_path)

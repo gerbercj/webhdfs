@@ -28,6 +28,7 @@ You now have access to the following methods:
 
  * append(path, data) - Add additional text to the end of a file
  * cat(path) - Display the contents of a stored file
+ * checksum(path) - Generate checksum information for a file
  * create(path, data) - Create a new file
  * home_dir - Get the user's home directory
  * ls(path) - List the contents of a directory
