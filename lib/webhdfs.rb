@@ -59,6 +59,10 @@ module WebHDFS
       JSON.parse(result.body)
     end
 
+    def summary(path)
+      result = request('GET', path, 'GETCONTENTSUMMARY')
+      JSON.parse(result.body)
+    end
   private
 
     def allowed_opts(opts, valid_keys)

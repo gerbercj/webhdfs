@@ -46,18 +46,6 @@ describe WebHDFS::Client do
     end
   end
 
-  describe '#status' do
-    it "should return a file's status" do
-      client.create(test_path, '')
-      node_type(test_path).should == 'FILE'
-      client.rm(test_path)
-    end
-    
-    it "should return a directory's status" do
-      node_type(root).should == 'DIRECTORY'
-    end
-  end
-
   describe '#mkdir' do
     after :each do
       client.rm(test_path, :recursive => true)
@@ -127,6 +115,24 @@ describe WebHDFS::Client do
       client.mkdir("#{test_path}/_test2")
       client.rm(test_path, :recursive => true)
       count_nodes(root, '_test').should == 0
+    end
+  end
+
+  describe '#status' do
+    it "should return a file's status" do
+      client.create(test_path, '')
+      node_type(test_path).should == 'FILE'
+      client.rm(test_path)
+    end
+    
+    it "should return a directory's status" do
+      node_type(root).should == 'DIRECTORY'
+    end
+  end
+
+  describe '#summary' do
+    it "should return a directory's summary" do
+      client.summary(root).keys.should == ['ContentSummary']
     end
   end
 end
