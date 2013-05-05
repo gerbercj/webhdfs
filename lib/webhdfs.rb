@@ -20,6 +20,11 @@ module WebHDFS
       result.body
     end
 
+    def cancel_token(token)
+      result = request('CANCELDELEGATIONTOKEN', 'PUT', '/', "&token=#{token}")
+      result.body
+    end
+
     def cat(path, opts={})
       opts = allowed_opts(opts, %i(offset length buffersize))
       result = request('OPEN', 'GET', path, opts)
@@ -49,6 +54,11 @@ module WebHDFS
       JSON.parse(result.body) unless result.body.empty?
     end
 
+    def get_token(renewer)
+      result = request('GETDELEGATIONTOKEN', 'GET', '/', "&renewer=#{renewer}")
+      JSON.parse(result.body)
+    end
+
     def home_dir()
       result = request('GETHOMEDIRECTORY')
       JSON.parse(result.body)
@@ -67,6 +77,11 @@ module WebHDFS
 
     def mv(path, destination)
       result = request('RENAME', 'PUT', path, "&destination=#{destination}")
+      JSON.parse(result.body)
+    end
+
+    def renew_token(token)
+      result = request('RENEWDELEGATIONTOKEN', 'PUT', '/', "&token=#{token}")
       JSON.parse(result.body)
     end
 
